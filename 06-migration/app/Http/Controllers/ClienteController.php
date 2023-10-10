@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Cliente;
 use Illuminate\Http\Request;
+use App\Models\Cliente;
+use App\Models\Endereco;
 
 class ClienteController extends Controller
 {
@@ -16,7 +17,7 @@ class ClienteController extends Controller
     public function index()
     {
         $data = Cliente::orderby('nome')->get();
-        return view('Cliente.index', compact('data'));
+        return view('clientes.index', compact('data'));
     }
 
     /**
@@ -26,7 +27,7 @@ class ClienteController extends Controller
      */
     public function create()
     {
-        return view('cliente.create');
+        return view('clientes.create');
     }
 
     /**
@@ -39,8 +40,7 @@ class ClienteController extends Controller
     {
         $regras = [
             'nome' => 'required|max:100|min:10',
-            'biografia' => 'required|max:1000|min:20',
-            'foto' => 'required'
+            'email' => 'required|max:1000|min:20',
         ];
 
         $msgs = [
@@ -50,12 +50,6 @@ class ClienteController extends Controller
         ];
         $request->validate($regras, $msgs);
 
-        if($request->hasFile('foto')){
-            $reg = new Cliente();
-            $reg -> nome = $request->nome;
-            $reg -> email = $request->email;
-            $reg->save;
-        }
     }
 
     /**
@@ -78,7 +72,7 @@ class ClienteController extends Controller
         $dados = Cliente::find($id);
 
         if(!isset($dados)) {return "<h1>ID: $id não encontrado!</h1>";}
-        return view('cliente.edit', compact('dados'));
+        return view('clientes.edit', compact('dados'));
     }
 
     /**
@@ -96,8 +90,7 @@ class ClienteController extends Controller
 
         $regras = [
             'nome' => 'required|max:100|min:10',
-            'biografia' => 'required|max:1000|min:20',
-            'foto' => 'required'
+            'email' => 'required|max:1000|min:20',
         ];
 
         $msgs = [
@@ -112,19 +105,12 @@ class ClienteController extends Controller
 
             // Insert no Banco
             $obj->nome = $request->nome;
-            $obj->biografia = $request->biografia;
+            $obj->email = $request->email;
             $obj->save();    
 
-            // Upload da Foto
-            $id = $obj->id;
-            $extensao_arq = $request->file('foto')->getClientOriginalExtension();
-            $nome_arq = $id.'_'.time().'.'.$extensao_arq;
-            $request->file('foto')->storeAs("public/$this->path", $nome_arq);
-            $obj->foto = $this->path."/".$nome_arq;
-            $obj->save();
         }
 
-        return redirect()->route('Cliente.index');
+        return redirect()->route('clientes.index');
     }
 
     /**
@@ -140,7 +126,7 @@ class ClienteController extends Controller
         if(!isset($obj)){ return "<h1>ID: $id não encontrado!";}
 
         $obj->destroy($id);
-        return redirect()->route('cliente.index');
+        return redirect()->route('clientes.index');
         
     }
 }
