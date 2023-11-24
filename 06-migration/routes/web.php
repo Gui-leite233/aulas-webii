@@ -18,3 +18,4 @@ Route::get('/', function () {
 })->name('index');
 
 Route::resource('enderecos', 'EnderecoController');
+Route::resource('clientes', 'ClienteController');
